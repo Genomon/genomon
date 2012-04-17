@@ -10,6 +10,9 @@ Redistribution and use in source and binary forms, with or without modification,
     other materials provided with the distribution.
   ・Neither the name of the "Laboratory of DNA Information Analysis, Human Genome Center, Institute of Medical Science, The University of Tokyo" 
     nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+  ・This software is not aimed at commercial use. please contact us before using it for commercial use.
+  ・We ask you to draw one of the following our papers when you present your paper in which genomon is used.
+    "Yoshida,K., et al. Frequent pathway mutations of splicing machinery in myelodysplasia. Nature 478, 64-69 (2011)"
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
@@ -17,8 +20,3 @@ HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, 
 LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON 
 ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE 
 USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-THIS SOFTWARE IS NOT AIMED AT COMMERCIAL USE. PLEASE CONTACT US BEFORE USING IT FOR COMMERCIAL USE. 
-
-WE ASK YOU TO DRAW ONE OF THE FOLLOWING OUR PAPERS WHEN YOU PRESENT YOUR PAPER IN WHICH GENOMON IS USED.
-"Yoshida,K., et al. Frequent pathway mutations of splicing machinery in myelodysplasia. Nature 478, 64-69 (2011)"
