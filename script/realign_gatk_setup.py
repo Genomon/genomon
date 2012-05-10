@@ -38,7 +38,7 @@ qsub.extend(['-e', LOGDIR, '-o', LOGDIR])
 # realign  
 ##########################
 jobIDs = []
-cmd = ['-l' ,'s_vmem=8G,mem_req=8', \
+cmd = ['-l' ,'s_vmem=12G,mem_req=12', \
 dir['script'] + '/my_gatkRealign_setup.sh', \
 data['hg19fasta'], \
 bin['gatk'], \
