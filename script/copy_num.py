@@ -78,8 +78,6 @@ if not (os.path.exists(dir['db'] +'/'+ BAIT)):
 
 BAIT_NUM = util.checkFileNum(INTERVAL)
 
-'''
-
 # total depth
 ##########################
 jobIDs = []
@@ -147,7 +145,6 @@ for type in TYPES[1:]:
         jobIDs.append(util.qsub_cmd(cmd,qsub))
 util.syncbarrier('filter base for copy number',jobIDs)
 
-'''
 
 # make as count bait file
 ##########################
