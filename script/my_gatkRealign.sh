@@ -27,13 +27,15 @@ REGION_TMP=${REGION/:/_}
 REGION_FILE_NAME=${REGION_TMP/-/_}
 echo ${REGION_FILE_NAME} 
 
+echo "rm ${OUTPUT_DIR}/temp${NUM}.${REGION_FILE_NAME}.bai"
+rm ${OUTPUT_DIR}/temp${NUM}.${REGION_FILE_NAME}.bai
 
-echo Create bam target intervals
+echo "${SAMTOOLS} view -h -b ${INPUT_BAM} ${REGION} > ${OUTPUT_DIR}/temp${NUM}.${REGION_FILE_NAME}.bam"
 ${SAMTOOLS} view -h -b ${INPUT_BAM} ${REGION} > ${OUTPUT_DIR}/temp${NUM}.${REGION_FILE_NAME}.bam
 check_error $?
 
 echo Create bam index
-${JAVA} -Xms6g -Xmx6g -Djava.io.tmpdir=${TMP} -jar ${PICARD}/BuildBamIndex.jar \
+${JAVA} -Xms8g -Xmx8g -Djava.io.tmpdir=${TMP} -jar ${PICARD}/BuildBamIndex.jar \
   INPUT=${OUTPUT_DIR}/temp${NUM}.${REGION_FILE_NAME}.bam \
   VALIDATION_STRINGENCY=SILENT \
   TMP_DIR=${TMP}
@@ -41,7 +43,7 @@ check_error $?
 
 echo Create realigner target intervals
 # Create target intervals for the realigner (can operate on a per chromosome level for faster processing)
-${JAVA} -Xms6g -Xmx6g -Djava.io.tmpdir=${TMP} -jar ${GATK}/GenomeAnalysisTK.jar \
+${JAVA} -Xms8g -Xmx8g -Djava.io.tmpdir=${TMP} -jar ${GATK}/GenomeAnalysisTK.jar \
   -T RealignerTargetCreator \
   -R ${GENREF} \
   -I ${OUTPUT_DIR}/temp${NUM}.${REGION_FILE_NAME}.bam \
@@ -52,7 +54,7 @@ check_error $?
 
 echo Realign reads around target intervals
 # Realign reads around previously identified target intervals (can operate on a per chromosome level for faster processing or even on a per interval basis)
-${JAVA} -Xms6g -Xmx6g -Djava.io.tmpdir=${TMP} -jar ${GATK}/GenomeAnalysisTK.jar \
+${JAVA} -Xms8g -Xmx8g -Djava.io.tmpdir=${TMP} -jar ${GATK}/GenomeAnalysisTK.jar \
   -T IndelRealigner \
   -R ${GENREF} \
   -I ${OUTPUT_DIR}/temp${NUM}.${REGION_FILE_NAME}.bam \
@@ -64,7 +66,7 @@ check_error $?
 
 echo Fix Mate Pair Information
 # Fix mate pair information in realigned bam file
-${JAVA} -Xms6g -Xmx6g -Djava.io.tmpdir=${TMP} -jar ${PICARD}/FixMateInformation.jar \
+${JAVA} -Xms8g -Xmx8g -Djava.io.tmpdir=${TMP} -jar ${PICARD}/FixMateInformation.jar \
 	INPUT=${OUTPUT_DIR}/temp${NUM}.${REGION_FILE_NAME}_realigned.bam \
 	SORT_ORDER=coordinate \
 	VALIDATION_STRINGENCY=LENIENT

@@ -47,14 +47,15 @@ SAMPLE  = args[0]
 RUNDATE = args[1]
 TYPES = []
 TYPES.append(args[2])
-TYPES.append(args[3])
+if (len(args) >= 4):
+  TYPES.append(args[3])
 if (len(args) == 5):
-    TYPES.append(args[4])
+  TYPES.append(args[4])
 
 # args check
-if (len(args) != 4 and len(args) != 5):
-    print "len(args) is fault"
-    sys.exit()
+# if (len(args) != 4 and len(args) != 5):
+#    print "len(args) is fault"
+#    sys.exit()
 
 LOGDIR= dir['log'] +'/'+ SAMPLE +'_'+ RUNDATE
 util.check_mkdir(LOGDIR)
@@ -86,7 +87,7 @@ for type in TYPES:
         sys.exit()
     inputbamFile = inputbamDir + '/' + BAM_FILE
     if not ( os.path.exists(inputbamFile)):
-        print inputbamFile1 + ' is not found \n'
+        print inputbamFile + ' is not found \n'
         sys.exit()
 
 if not ( os.path.isdir(INTERVAL)):
@@ -166,6 +167,19 @@ util.syncbarrier('Extracting merge annovar file ',jobIDs)
 # annovar 
 ##########################
 jobIDs = []
+if (len(TYPES) == 1):
+    cmd = ['-l', 's_vmem=8G,mem_req=8', \
+    dir['script'] + '/my_annovar.sh', \
+    SAMPLE +'_'+ RUNDATE, \
+    TYPES[0], \
+    '---', \
+    fisherDir, \
+    bin['annovar'], \
+    dir['script'], \
+    dir['tmp'], \
+    bin['python2.6']]
+    jobIDs.append(util.qsub_cmd(cmd,qsub))
+
 for type in TYPES[1:]:
     cmd = ['-l', 's_vmem=8G,mem_req=8', \
     dir['script'] + '/my_annovar.sh', \
@@ -175,15 +189,10 @@ for type in TYPES[1:]:
     fisherDir, \
     bin['annovar'], \
     dir['script'], \
-    db['inhouseflg'], \
-    db['cosmicflg'], \
-    bin['java6'], \
-    bin['javatools'], \
     dir['tmp'], \
     bin['python2.6']]
     jobIDs.append(util.qsub_cmd(cmd,qsub))
 util.syncbarrier('Adding annotations to the result',jobIDs)
-
 
 # clean up tmp file 
 ##########################

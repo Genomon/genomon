@@ -12,13 +12,9 @@ TYPE2=$3 # e.g. normal
 INPUTPATH=$4
 ANNOPATH=$5
 SCRIPTDIR=$6
-INHOUSEFLG=$7 # 0:false 1:true
-COSMICFLG=$8  # 0:false 1:true
-JAVA=$9
-JAVATOOLS=${10}
-TMPDIR=${11}
-PYTHON=${12}
-DEBUG_MODE=${13}
+TMPDIR=$7
+PYTHON=$8
+DEBUG_MODE=$9
 
 source ${SCRIPTDIR}/utility.sh
 
@@ -27,13 +23,18 @@ if [ -z DEBUG_MODE ]; then
   sh ${SCRIPTDIR}/sleep.sh
 fi
 
+TYPE_FILENAME=${TYPE}_${TYPE2}
+if [ ${TYPE2} = "---" ]; then
+  TYPE_FILENAME=${TYPE}
+fi
+
 OUTFILE_PREFIX=sum_${SAMPLE_FOLDER}_${TYPE}
 
 
 CURRDIR=`pwd`
 cd ${ANNOPATH}
-echo "./summarize_annovar.pl -buildver hg19 -verdbsnp 131 ${INPUTPATH}/output.${TYPE}_${TYPE2}.anno humandb/ -outfile ${OUTFILE_PREFIX}"
-./summarize_annovar.pl -buildver hg19 -verdbsnp 131 ${INPUTPATH}/output.${TYPE}_${TYPE2}.anno humandb/ -outfile ${OUTFILE_PREFIX}
+echo "./summarize_annovar.pl -buildver hg19 -verdbsnp 131 ${INPUTPATH}/output.${TYPE_FILENAME}.anno humandb/ -outfile ${OUTFILE_PREFIX}"
+./summarize_annovar.pl -buildver hg19 -verdbsnp 131 -outfile ${OUTFILE_PREFIX} ${INPUTPATH}/output.${TYPE_FILENAME}.anno humandb/
 check_error $?
 cd ${CURRDIR}
 
@@ -56,14 +57,23 @@ ${PYTHON} ${SCRIPTDIR}/csv2tsv.py ${INPUTPATH}/${OUTFILE_PREFIX}.genome_summary.
 check_error $?
 
 
-echo "perl ${SCRIPTDIR}/procSummary.pl ${INPUTPATH}/${OUTFILE_PREFIX}.exome_summary.txt > ${INPUTPATH}/${OUTFILE_PREFIX}.exome.result.txt"
-perl ${SCRIPTDIR}/procSummary.pl ${INPUTPATH}/${OUTFILE_PREFIX}.exome_summary.txt > ${INPUTPATH}/${OUTFILE_PREFIX}.exome.result.txt
-check_error $?
+if [ ${TYPE2} = "---" ]; then
+  echo "perl ${SCRIPTDIR}/procSummary.barcode.pl ${INPUTPATH}/${OUTFILE_PREFIX}.exome_summary.txt > ${INPUTPATH}/${OUTFILE_PREFIX}.exome.result.txt"
+  perl ${SCRIPTDIR}/procSummary.barcode.pl ${INPUTPATH}/${OUTFILE_PREFIX}.exome_summary.txt > ${INPUTPATH}/${OUTFILE_PREFIX}.exome.result.txt
+  check_error $?
 
-echo "perl ${SCRIPTDIR}/procSummary.pl ${INPUTPATH}/${OUTFILE_PREFIX}.genome_summary.txt > ${INPUTPATH}/${OUTFILE_PREFIX}.genome.result.txt"
-perl ${SCRIPTDIR}/procSummary.pl ${INPUTPATH}/${OUTFILE_PREFIX}.genome_summary.txt > ${INPUTPATH}/${OUTFILE_PREFIX}.genome.result.txt
-check_error $?
+  echo "perl ${SCRIPTDIR}/procSummary.barcode.pl ${INPUTPATH}/${OUTFILE_PREFIX}.genome_summary.txt > ${INPUTPATH}/${OUTFILE_PREFIX}.genome.result.txt"
+  perl ${SCRIPTDIR}/procSummary.barcode.pl ${INPUTPATH}/${OUTFILE_PREFIX}.genome_summary.txt > ${INPUTPATH}/${OUTFILE_PREFIX}.genome.result.txt
+  check_error $?
+else 
+  echo "perl ${SCRIPTDIR}/procSummary.pl ${INPUTPATH}/${OUTFILE_PREFIX}.exome_summary.txt > ${INPUTPATH}/${OUTFILE_PREFIX}.exome.result.txt"
+  perl ${SCRIPTDIR}/procSummary.pl ${INPUTPATH}/${OUTFILE_PREFIX}.exome_summary.txt > ${INPUTPATH}/${OUTFILE_PREFIX}.exome.result.txt
+  check_error $?
 
+  echo "perl ${SCRIPTDIR}/procSummary.pl ${INPUTPATH}/${OUTFILE_PREFIX}.genome_summary.txt > ${INPUTPATH}/${OUTFILE_PREFIX}.genome.result.txt"
+  perl ${SCRIPTDIR}/procSummary.pl ${INPUTPATH}/${OUTFILE_PREFIX}.genome_summary.txt > ${INPUTPATH}/${OUTFILE_PREFIX}.genome.result.txt
+  check_error $?
+fi
 
 rm ${ANNOPATH}/${OUTFILE_PREFIX}.*
 check_error $?

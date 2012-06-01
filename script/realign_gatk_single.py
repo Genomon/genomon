@@ -71,64 +71,14 @@ for type in TYPES:
 
 BAIT_NUM = util.checkFileNum(INTERVAL)
 
-# make read group list 
-##########################
-jobIDs = []
-for type in TYPES:
-  inputbam  = outputWorkDir + '/map_bwa/'+ type +'/ga.bam'
-  outputReadgroupList  = outputWorkDir + '/map_bwa/'+ type +'/readgroup.list'
-
-  cmd = ['-l' ,'s_vmem=2G,mem_req=2', \
-  dir['script'] + '/make_readgroup_file.sh', \
-  inputbam, \
-  outputReadgroupList, \
-  bin['samtools'], \
-  dir['script']]
-  jobIDs.append(util.qsub_cmd(cmd,qsub))
-util.syncbarrier('make read group list',jobIDs)
-
-
-# merge normal bam and tumor bam 
-##########################
-if (len(args) > 3):
-  jobIDs = []
-  bamListCsvStrTmp = ''
-  for type in TYPES:
-    bamListCsvStrTmp = bamListCsvStrTmp + outputWorkDir + '/map_bwa/'+ type +'/ga.bam' + ','
-  outputbam = outputWorkDir + '/map_bwa/merge/ga.bam'
-
-  lastindex = len(bamListCsvStrTmp) - 1
-  bamListCsvStr = bamListCsvStrTmp[0:lastindex]
-
-  cmd = ['-l' ,'s_vmem=16G,mem_req=16', \
-  dir['script'] + '/mergebam.sh', \
-  bamListCsvStr, \
-  outputbam, \
-  dir['script'], \
-  bin['java6'], \
-  bin['picard'], \
-  dir['tmp']]
-  jobIDs.append(util.qsub_cmd(cmd,qsub))
-  util.syncbarrier('merge normal and tumor bam',jobIDs)
-
-else:
-  inputbam  = outputWorkDir + '/map_bwa/'+ TYPES[0] +'/ga.bam'
-  outputbam = outputWorkDir + '/map_bwa/merge/ga.bam'
-  
-  cmd = ['-l' ,'s_vmem=2G,mem_req=2', \
-  dir['script'] + '/linkbam.sh', \
-  inputbam,
-  outputbam]
-  jobIDs.append(util.qsub_cmd(cmd,qsub))
-  util.syncbarrier('link bam',jobIDs)
-
 
 # realign  
 ##########################
 jobIDs = []
-inputbam  = outputWorkDir + '/map_bwa/merge/ga.bam'
-outputdir = outputWorkDir + '/realign_gatk/merge/tmp'
-for NUM in range(1, BAIT_NUM + 1):
+for type in TYPES:
+  inputbam  = outputWorkDir + '/map_bwa/'+ type +'/ga.bam'
+  outputdir = outputWorkDir + '/realign_gatk/'+ type +'/tmp'
+  for NUM in range(1, BAIT_NUM + 1):
     intervallist = INTERVAL +'/'+ str(NUM) + '.interval_list'
     region = util.get_interval_region(intervallist)
     cmd = ['-l' ,'s_vmem=12G,mem_req=12', \
@@ -147,50 +97,6 @@ for NUM in range(1, BAIT_NUM + 1):
     bin['picard']]
     jobIDs.append(util.qsub_cmd(cmd,qsub))
 util.syncbarrier('gatk realign',jobIDs)
-
-
-# pull out tumor or normal reads from merge realigned bam 
-##########################
-jobIDs = []
-inputdir = outputWorkDir + '/realign_gatk/merge/tmp'
-for type in TYPES:
-  rglist  = outputWorkDir + '/map_bwa/'+ type +'/readgroup.list'
-  outputdir = outputWorkDir + '/realign_gatk/'+ type +'/tmp'
-  for NUM in range(1, BAIT_NUM + 1):
-    intervallist = INTERVAL +'/'+ str(NUM) + '.interval_list'
-    region = util.get_interval_region(intervallist)
-    cmd = ['-l' ,'s_vmem=2G,mem_req=2', \
-    dir['script'] + '/pulloutRead.sh', \
-    rglist, \
-    inputdir, \
-    outputdir, \
-    str(NUM), \
-    region, \
-    bin['samtools'], \
-    dir['script']]
-    jobIDs.append(util.qsub_cmd(cmd,qsub))
-util.syncbarrier('pull out tumor or normal reads from merge realigned bam',jobIDs)
-
-
-# convert sam to bam 
-##########################
-jobIDs = []
-for type in TYPES:
-    inoutdir = outputWorkDir + '/realign_gatk/'+ type +'/tmp'
-    for NUM in range(1, BAIT_NUM + 1):
-        intervallist = INTERVAL +'/'+ str(NUM) + '.interval_list'
-        region = util.get_interval_region(intervallist)
-        cmd = ['-l' ,'s_vmem=16G,mem_req=16', \
-        dir['script'] + '/sam2orgbam_realignment.sh', \
-        inoutdir, \
-        str(NUM), \
-        region, \
-        bin['picard'], \
-        bin['java6'], \
-        dir['tmp'], \
-        dir['script']]
-        jobIDs.append(util.qsub_cmd(cmd,qsub))
-util.syncbarrier('convert sam to bam',jobIDs)
 
 
 # merge realigned bam
@@ -214,17 +120,6 @@ util.syncbarrier('merge realigned bam',jobIDs)
 
 # clean up merge aligned bam 
 ##########################
-jobIDs = []
-inputdir  = outputWorkDir + '/map_bwa/merge'
-cmd = [dir['script'] + '/rm.sh' , \
-inputdir]
-jobIDs.append(util.qsub_cmd(cmd,qsub))
-
-inputdir = outputWorkDir + '/realign_gatk/merge'
-cmd = [dir['script'] + '/rm.sh' , \
-inputdir]
-jobIDs.append(util.qsub_cmd(cmd,qsub))
-
 for type in TYPES:
     inputdir  = outputWorkDir + '/realign_gatk/'+ type +'/tmp'
     cmd = [dir['script'] + '/rm.sh' , \
