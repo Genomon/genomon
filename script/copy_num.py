@@ -41,11 +41,12 @@ BAIT = args[2] +'.bed'
 TYPES = []
 TYPES.append(args[3])
 TYPES.append(args[4])
-if (len(args) > 5 and args[5] != ''):
-  TYPES.append(args[5])
+#if (len(args) > 5 and args[5] != ''):
+#  TYPES.append(args[5])
 
 # args check
-if (len(args) != 5 and len(args) != 6):
+# if (len(args) != 5 and len(args) != 6):
+if (len(args) != 5):
     print "len(args) is fault"
     sys.exit()
 
