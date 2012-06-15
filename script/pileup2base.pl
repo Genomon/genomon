@@ -116,8 +116,9 @@ while(<IN>) {
       print length($curRow[4]) . "\t" . length($curRow[5]) . "\n";
     }
 
+    $uref  = uc($curRow[2]);
     $lref  = lc($curRow[2]);
-    $curRow[4] =~ s/\./$curRow[2]/g;
+    $curRow[4] =~ s/\./$uref/g;
     $curRow[4] =~ s/,/$lref/g;
 
     %base2qual = ();
