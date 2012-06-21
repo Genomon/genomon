@@ -15,7 +15,7 @@ source ${SCRIPTDIR}/utility.sh
 
 
 echo Realign reads around target intervals
-${JAVA} -Xms6g -Xmx6g -Djava.io.tmpdir=${TMP} -jar ${GATK}/GenomeAnalysisTK.jar \
+${JAVA} -Xms12g -Xmx12g -Djava.io.tmpdir=${TMP} -jar ${GATK}/GenomeAnalysisTK.jar \
   -T IndelRealigner \
   -targetIntervals ../install/gatksetup/1.interval_list \
   -R ${GENREF} \
